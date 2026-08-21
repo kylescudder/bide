@@ -1,0 +1,11 @@
+[Unit]
+Description=Check Bide timers and alarms
+
+[Timer]
+OnBootSec=10s
+OnUnitActiveSec=15s
+Persistent=true
+AccuracySec=1s
+
+[Install]
+WantedBy=timers.target

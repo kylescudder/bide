@@ -1,0 +1,27 @@
+# Maintainer: Kyle Scudder
+pkgname=bide-bin
+pkgver=0.1.0
+pkgrel=1
+pkgdesc='Persistent countdown timers and one-off alarms for Linux desktops'
+arch=('x86_64' 'aarch64')
+url='https://github.com/kylescudder/bide'
+license=('MIT')
+depends=('glibc' 'libnotify')
+optdepends=('libcanberra: play the default expiry sound')
+provides=('bide')
+conflicts=('bide')
+source=(
+  "bide.service::https://raw.githubusercontent.com/kylescudder/bide/v${pkgver}/systemd/bide.service"
+  "bide.timer::https://raw.githubusercontent.com/kylescudder/bide/v${pkgver}/systemd/bide.timer"
+)
+source_x86_64=("bide-${pkgver}-x86_64.tar.gz::https://github.com/kylescudder/bide/releases/download/v${pkgver}/bide-x86_64-unknown-linux-gnu.tar.gz")
+source_aarch64=("bide-${pkgver}-aarch64.tar.gz::https://github.com/kylescudder/bide/releases/download/v${pkgver}/bide-aarch64-unknown-linux-gnu.tar.gz")
+sha256sums=('SKIP' 'SKIP')
+sha256sums_x86_64=('SKIP')
+sha256sums_aarch64=('SKIP')
+
+package() {
+  install -Dm755 bide "$pkgdir/usr/bin/bide"
+  install -Dm644 bide.service "$pkgdir/usr/lib/systemd/user/bide.service"
+  install -Dm644 bide.timer "$pkgdir/usr/lib/systemd/user/bide.timer"
+}
