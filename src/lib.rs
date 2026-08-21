@@ -347,7 +347,7 @@ pub fn config_commands() -> (String, String) {
     let c: Option<C> = fs::read(path)
         .ok()
         .and_then(|b| serde_json::from_slice(&b).ok());
-    (c.as_ref().and_then(|x|x.notify_command.clone()).unwrap_or_else(||"notify-send -u critical -t 0 -- \"$1\" \"$2\"".into()),c.and_then(|x|x.sound_command).unwrap_or_else(||"canberra-gtk-play -i alarm-clock-elapsed || paplay /usr/share/sounds/freedesktop/stereo/alarm-clock-elapsed.oga".into()))
+    (c.as_ref().and_then(|x|x.notify_command.clone()).unwrap_or_else(||"notify-send -u critical -t 0 -- \"$1\" \"$2\"".into()),c.and_then(|x|x.sound_command).unwrap_or_else(||"canberra-gtk-play -i complete || paplay /usr/share/sounds/freedesktop/stereo/complete.oga".into()))
 }
 
 pub fn state_path_for_tests(path: &Path) -> Store {

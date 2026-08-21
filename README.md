@@ -80,7 +80,7 @@ Configuration may be written to `$XDG_CONFIG_HOME/bide/config.json`:
 ```json
 {
   "notify_command": "notify-send -u critical -t 0 -- \"$1\" \"$2\"",
-  "sound_command": "canberra-gtk-play -i alarm-clock-elapsed"
+  "sound_command": "canberra-gtk-play -i complete"
 }
 ```
 
