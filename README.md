@@ -109,9 +109,12 @@ cargo test
 
 Pushing a `v*` tag runs `.github/workflows/release.yml`, builds locked
 `x86_64` and `aarch64` Linux binaries, and publishes versioned archives to a
-GitHub Release. Publishing that release triggers `.github/workflows/aur.yml`,
-which calculates release and systemd-file checksums, generates the versioned
-`bide-bin` PKGBUILD, and pushes it to the AUR without force-pushing.
+GitHub Release. A maintainer then explicitly runs the **Publish AUR package
+(manual)** workflow with that release version. It calculates release and
+systemd-file checksums, generates the versioned `bide-bin` PKGBUILD, and pushes
+it to the AUR without force-pushing. AUR credentials are therefore never needed
+by ordinary CI or GitHub Release jobs, and unavailable credentials cannot turn
+a normal release red.
 
 Repository maintainers must configure these GitHub Actions secrets:
 
@@ -122,6 +125,9 @@ Repository maintainers must configure these GitHub Actions secrets:
 
 The AUR account must own or be a co-maintainer of `bide-bin`. For the first
 publication, ensure the package name is available; the workflow's first SSH push
-creates it. The workflow can be rerun manually for an existing release by
+creates it. New-account registration is currently unavailable because of the
+AUR's global anti-abuse pause. New maintainers must wait for registration to
+reopen and monitor Arch Linux news and the `aur-general` mailing list for status
+updates. Once access is available, run the workflow for an existing release by
 supplying its version without the `v` prefix. No AUR credential is required for
 ordinary CI or GitHub Release builds.

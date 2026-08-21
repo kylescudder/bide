@@ -1,8 +1,6 @@
-name: Publish AUR package
+name: Publish AUR package (manual)
 
 on:
-  release:
-    types: [published]
   workflow_dispatch:
     inputs:
       version:
@@ -17,7 +15,7 @@ jobs:
 
       - name: Prepare versioned PKGBUILD
         env:
-          RELEASE_VERSION: ${{ inputs.version || github.event.release.tag_name }}
+          RELEASE_VERSION: ${{ inputs.version }}
         run: |
           version="${RELEASE_VERSION#v}"
           test -n "$version"
@@ -45,5 +43,5 @@ jobs:
           commit_username: ${{ secrets.AUR_USERNAME }}
           commit_email: ${{ secrets.AUR_EMAIL }}
           ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
-          commit_message: Update bide-bin to ${{ inputs.version || github.event.release.tag_name }}
+          commit_message: Update bide-bin to ${{ inputs.version }}
           ssh_keyscan_types: rsa,ecdsa,ed25519
