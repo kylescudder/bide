@@ -1,0 +1,49 @@
+name: Publish AUR package
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Existing GitHub release version without the v prefix
+        required: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Prepare versioned PKGBUILD
+        env:
+          RELEASE_VERSION: ${{ inputs.version || github.event.release.tag_name }}
+        run: |
+          version="${RELEASE_VERSION#v}"
+          test -n "$version"
+          sed -i "s/^pkgver=.*/pkgver=$version/" packaging/aur/PKGBUILD
+
+          service_url="https://raw.githubusercontent.com/kylescudder/bide/v${version}/systemd/bide.service"
+          timer_url="https://raw.githubusercontent.com/kylescudder/bide/v${version}/systemd/bide.timer"
+          x86_url="https://github.com/kylescudder/bide/releases/download/v${version}/bide-x86_64-unknown-linux-gnu.tar.gz"
+          arm_url="https://github.com/kylescudder/bide/releases/download/v${version}/bide-aarch64-unknown-linux-gnu.tar.gz"
+
+          service_sum="$(curl --fail --location --silent --show-error "$service_url" | sha256sum | cut -d' ' -f1)"
+          timer_sum="$(curl --fail --location --silent --show-error "$timer_url" | sha256sum | cut -d' ' -f1)"
+          x86_sum="$(curl --fail --location --silent --show-error "$x86_url" | sha256sum | cut -d' ' -f1)"
+          arm_sum="$(curl --fail --location --silent --show-error "$arm_url" | sha256sum | cut -d' ' -f1)"
+
+          sed -i "s/sha256sums=('SKIP' 'SKIP')/sha256sums=('$service_sum' '$timer_sum')/" packaging/aur/PKGBUILD
+          sed -i "s/sha256sums_x86_64=('SKIP')/sha256sums_x86_64=('$x86_sum')/" packaging/aur/PKGBUILD
+          sed -i "s/sha256sums_aarch64=('SKIP')/sha256sums_aarch64=('$arm_sum')/" packaging/aur/PKGBUILD
+
+      - name: Publish bide-bin
+        uses: KSXGitHub/github-actions-deploy-aur@v4.2.0
+        with:
+          pkgname: bide-bin
+          pkgbuild: packaging/aur/PKGBUILD
+          commit_username: ${{ secrets.AUR_USERNAME }}
+          commit_email: ${{ secrets.AUR_EMAIL }}
+          ssh_private_key: ${{ secrets.AUR_SSH_PRIVATE_KEY }}
+          commit_message: Update bide-bin to ${{ inputs.version || github.event.release.tag_name }}
+          ssh_keyscan_types: rsa,ecdsa,ed25519

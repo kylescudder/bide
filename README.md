@@ -7,6 +7,20 @@ how time is managed.
 
 ## Install
 
+### Arch Linux / AUR
+
+Once the initial AUR package is published:
+
+```sh
+paru -S bide-bin
+systemctl --user enable --now bide.timer
+```
+
+The binary package installs the executable and user systemd definitions. It
+does not enable user units during package installation.
+
+### GitHub release
+
 Download the versioned binary for your architecture from GitHub Releases, place
 it at `~/.local/bin/bide`, then install the files in `systemd/` to
 `~/.config/systemd/user/` and run:
@@ -90,3 +104,24 @@ cargo fmt --check
 cargo clippy --all-targets -- -D warnings
 cargo test
 ```
+
+## Releasing and AUR publication
+
+Pushing a `v*` tag runs `.github/workflows/release.yml`, builds locked
+`x86_64` and `aarch64` Linux binaries, and publishes versioned archives to a
+GitHub Release. Publishing that release triggers `.github/workflows/aur.yml`,
+which calculates release and systemd-file checksums, generates the versioned
+`bide-bin` PKGBUILD, and pushes it to the AUR without force-pushing.
+
+Repository maintainers must configure these GitHub Actions secrets:
+
+- `AUR_USERNAME`: the name recorded in AUR commits
+- `AUR_EMAIL`: the email recorded in AUR commits
+- `AUR_SSH_PRIVATE_KEY`: an SSH private key whose public key is registered at
+  `https://aur.archlinux.org/account/`
+
+The AUR account must own or be a co-maintainer of `bide-bin`. For the first
+publication, ensure the package name is available; the workflow's first SSH push
+creates it. The workflow can be rerun manually for an existing release by
+supplying its version without the `v` prefix. No AUR credential is required for
+ordinary CI or GitHub Release builds.
