@@ -487,6 +487,9 @@ fn rofi_header(prompt: &str, message: &str, no_custom: bool, data: &str) {
     if !data.is_empty() {
         println!("\0data\x1f{data}")
     }
+    if !no_custom {
+        println!("Type your response above, then press Enter\0nonselectable\x1ftrue");
+    }
 }
 fn rofi_row(label: &str, subtitle: &str, info: &str) {
     let safe = label
