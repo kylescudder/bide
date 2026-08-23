@@ -251,6 +251,11 @@ fn run() -> Result<()> {
         Cmd::Rofi { launch, input } => {
             if launch {
                 launch_rofi()?;
+            } else if env::var("ROFI_RETV").as_deref() == Ok("10") {
+                store.read(|s| {
+                    rofi_main(s, &clock, true);
+                    Ok(())
+                })?;
             } else {
                 store.transaction(|s| rofi(s, &clock, &notifier, input.unwrap_or_default()))?
             }
@@ -445,6 +450,11 @@ fn rofi(
             _ => {}
         }
     }
+    rofi_main(state, clock, false);
+    Ok(())
+}
+
+fn rofi_main(state: &State, clock: &dyn Clock, keep_ui_state: bool) {
     rofi_header(
         "Timers & Alarms",
         "Create or manage multiple timers and alarms",
@@ -452,7 +462,7 @@ fn rofi(
         "",
     );
     println!("\0use-hot-keys\x1ftrue");
-    if retv == "10" {
+    if keep_ui_state {
         println!("\0keep-selection\x1ftrue");
         println!("\0keep-filter\x1ftrue");
     }
@@ -485,7 +495,6 @@ fn rofi(
     if shown == 0 {
         println!("No active timers or alarms\0nonselectable\x1ftrue");
     }
-    Ok(())
 }
 fn rofi_header(prompt: &str, message: &str, no_custom: bool, data: &str) {
     println!("\0prompt\x1f{prompt}");

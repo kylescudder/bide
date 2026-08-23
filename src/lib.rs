@@ -167,6 +167,28 @@ impl Store {
         FileExt::unlock(&lock)?;
         Ok(out)
     }
+
+    pub fn read<T>(&self, f: impl FnOnce(&State) -> Result<T>) -> Result<T> {
+        if let Some(p) = self.path.parent() {
+            fs::create_dir_all(p)?;
+        }
+        let lock_path = self.path.with_extension("lock");
+        let lock = OpenOptions::new()
+            .create(true)
+            .truncate(false)
+            .read(true)
+            .write(true)
+            .open(lock_path)?;
+        lock.lock_shared()?;
+        let state = if self.path.exists() {
+            serde_json::from_reader(File::open(&self.path)?).context("invalid state file")?
+        } else {
+            State::default()
+        };
+        let out = f(&state)?;
+        FileExt::unlock(&lock)?;
+        Ok(out)
+    }
 }
 
 pub fn parse_duration(input: &str) -> Result<i64> {
