@@ -6,7 +6,7 @@ use std::{
     fs::{self, File, OpenOptions},
     io::Write,
     path::{Path, PathBuf},
-    process::Command,
+    process::{Command, Stdio},
 };
 use uuid::Uuid;
 
@@ -108,13 +108,19 @@ impl Notifier for CommandNotifier {
             .arg("bide")
             .arg(title)
             .arg(&body)
-            .status();
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn();
         let s = Command::new("sh")
             .arg("-c")
             .arg(&self.sound_command)
-            .status();
-        if !matches!(n, Ok(x) if x.success()) || !matches!(s, Ok(x) if x.success()) {
-            bail!("notification or sound command failed")
+            .stdin(Stdio::null())
+            .stdout(Stdio::null())
+            .stderr(Stdio::null())
+            .spawn();
+        if n.is_err() || s.is_err() {
+            bail!("failed to start notification or sound command")
         }
         Ok(())
     }

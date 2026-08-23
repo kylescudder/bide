@@ -84,9 +84,10 @@ Configuration may be written to `$XDG_CONFIG_HOME/bide/config.json`:
 }
 ```
 
-Notification command arguments are title (`$1`) and label/body (`$2`). Delivery
-failure is reported by the tick but never rolls back expiry or causes duplicate
-delivery.
+Notification command arguments are title (`$1`) and label/body (`$2`). Commands
+are started in the background so sound playback never blocks timer state or UI
+commands. A failure to start a command is reported by the tick, but never rolls
+back expiry or causes duplicate delivery.
 
 ## Waybar contract
 
