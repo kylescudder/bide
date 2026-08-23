@@ -488,6 +488,7 @@ fn rofi_header(prompt: &str, message: &str, no_custom: bool, data: &str) {
         println!("\0data\x1f{data}")
     }
     if !no_custom {
+        println!("\0new-selection\x1f-1");
         println!("Type your response above, then press Enter\0nonselectable\x1ftrue");
     }
 }
