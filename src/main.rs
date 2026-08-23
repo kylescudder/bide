@@ -479,6 +479,7 @@ fn rofi(
 fn rofi_header(prompt: &str, message: &str, no_custom: bool, data: &str) {
     println!("\0prompt\x1f{prompt}");
     println!("\0message\x1f{message}");
+    println!("\0markup-rows\x1ftrue");
     println!(
         "\0no-custom\x1f{}",
         if no_custom { "true" } else { "false" }
