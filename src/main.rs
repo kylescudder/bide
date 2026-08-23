@@ -51,6 +51,8 @@ enum Cmd {
         action: Option<WaybarAction>,
     },
     Rofi {
+        #[arg(long)]
+        launch: bool,
         input: Option<String>,
     },
     Watch {
@@ -246,8 +248,12 @@ fn run() -> Result<()> {
             }
             Ok(())
         })?,
-        Cmd::Rofi { input } => {
-            store.transaction(|s| rofi(s, &clock, &notifier, input.unwrap_or_default()))?
+        Cmd::Rofi { launch, input } => {
+            if launch {
+                launch_rofi()?;
+            } else {
+                store.transaction(|s| rofi(s, &clock, &notifier, input.unwrap_or_default()))?
+            }
         }
         Cmd::Watch { waybar: enabled } => {
             if !enabled {
@@ -445,6 +451,11 @@ fn rofi(
         true,
         "",
     );
+    println!("\0use-hot-keys\x1ftrue");
+    if retv == "10" {
+        println!("\0keep-selection\x1ftrue");
+        println!("\0keep-filter\x1ftrue");
+    }
     rofi_row("New timer", "Countdown", "new_timer");
     rofi_row("New alarm", "Clock time", "new_alarm");
     let mut shown = 0;
@@ -480,6 +491,7 @@ fn rofi_header(prompt: &str, message: &str, no_custom: bool, data: &str) {
     println!("\0prompt\x1f{prompt}");
     println!("\0message\x1f{message}");
     println!("\0markup-rows\x1ftrue");
+    println!("\0use-hot-keys\x1ffalse");
     println!(
         "\0no-custom\x1f{}",
         if no_custom { "true" } else { "false" }
@@ -492,6 +504,26 @@ fn rofi_header(prompt: &str, message: &str, no_custom: bool, data: &str) {
         println!("Type your response above, then press Enter\0nonselectable\x1ftrue");
     }
 }
+
+fn launch_rofi() -> Result<()> {
+    let executable = env::current_exe()?;
+    let mode = format!("bide:{} rofi", executable.display());
+    let status = std::process::Command::new("rofi")
+        .args([
+            "-show",
+            "bide",
+            "-modes",
+            &mode,
+            "-theme-str",
+            "configuration { timeout { delay: 1; action: \"kb-custom-1\"; } }",
+        ])
+        .status()?;
+    if !status.success() {
+        bail!("rofi exited with status {status}")
+    }
+    Ok(())
+}
+
 fn rofi_row(label: &str, subtitle: &str, info: &str) {
     let safe = label
         .replace('&', "&amp;")

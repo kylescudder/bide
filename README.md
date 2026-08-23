@@ -98,6 +98,12 @@ lists active timers and upcoming alarms; `class` is `timer` plus `running`,
 displayed stable ID. `watch --waybar` emits one object per line each second so
 Waybar refreshes promptly without starting additional processes.
 
+## Rofi
+
+`bide rofi --launch` opens the timer and alarm menu. Its main list refreshes
+once per second so active countdowns remain current; input and action screens
+pause refreshes while the user interacts with them.
+
 ## Development
 
 ```sh
