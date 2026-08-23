@@ -101,8 +101,8 @@ Waybar refreshes promptly without starting additional processes.
 ## Rofi
 
 `bide rofi --launch` opens the timer and alarm menu. Its main list refreshes
-once per second so active countdowns remain current; input and action screens
-pause refreshes while the user interacts with them.
+several times per second so active countdowns remain current; input and action
+screens pause refreshes while the user interacts with them.
 
 ## Development
 

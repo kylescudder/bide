@@ -515,7 +515,7 @@ fn launch_rofi() -> Result<()> {
             "-modes",
             &mode,
             "-theme-str",
-            "configuration { timeout { delay: 1; action: \"kb-custom-1\"; } }",
+            "configuration { timeout { delay: 0.25; action: \"kb-custom-1\"; } }",
         ])
         .status()?;
     if !status.success() {
