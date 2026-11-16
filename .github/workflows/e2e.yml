@@ -1,0 +1,18 @@
+name: End-to-end
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  e2e:
+    name: E2E tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo build --locked
+      - name: Test persistent timer lifecycle through the real CLI
+        run: python3 e2e/cli_journey.py -v
