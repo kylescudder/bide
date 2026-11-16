@@ -131,3 +131,10 @@ reopen and monitor Arch Linux news and the `aur-general` mailing list for status
 updates. Once access is available, run the workflow for an existing release by
 supplying its version without the `v` prefix. No AUR credential is required for
 ordinary CI or GitHub Release builds.
+
+## End-to-end check
+
+`cargo build --locked && python3 e2e/cli_journey.py -v` drives the built `bide` binary
+through a timer's add, pause, resume and cancel lifecycle. Each step runs in a fresh
+process, with state isolated in a temporary `XDG_STATE_HOME`. Pull requests run it in
+the **E2E tests** job. bide is Linux-only, so on macOS run it in a Linux container.
